@@ -1,6 +1,6 @@
 [package]
 name = "future-clicker"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Greg \"GothAck\" Miell <rust@greg.gothack.ninja>"]
 description = "Reimplementation of manual_future without using `futures` unstable"
 repository = "https://github.com/GothAck/future-clicker-rs"

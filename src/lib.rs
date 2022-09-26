@@ -1,5 +1,5 @@
 //! A [`Future`] value that resolves once it's explicitly completed, potentially
-//! from a different thread or task, similar to Java's [`ControlledFuture`].
+//! from a different thread or task, similar to Java's `CompletableFuture`.
 //!
 //! Currently, this is implemented using [`Mutex`][parking_lot::Mutex] from the [`parking_lot`] crate.
 //!
