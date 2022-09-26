@@ -1,11 +1,11 @@
-//! A `Future` value that resolves once it's explicitly completed, potentially
-//! from a different thread or task, similar to Java's `CompletableFuture`.
+//! A [`Future`] value that resolves once it's explicitly completed, potentially
+//! from a different thread or task, similar to Java's [`CompletableFuture`].
 //!
-//! Currently, this is implemented using the `Mutex` from the `parking_lot` crate.
+//! Currently, this is implemented using [`Mutex`][parking_lot::Mutex] from the [`parking_lot`] crate.
 //!
 //! # Examples
 //!
-//! Create an incomplete `CompletableFuture` and explicitly complete it with the
+//! Create an incomplete [`CompletableFuture`] and explicitly complete it with the
 //! completer:
 //! ```
 //! # use completable_future::CompletableFuture;
@@ -15,7 +15,7 @@
 //! assert_eq!(block_on(future), Ok(5));
 //! ```
 //!
-//! Create an initially complete `CompletableFuture` that can be immediately
+//! Create an initially complete [`CompletableFuture`] that can be immediately
 //! resolved:
 //! ```
 //! # use completable_future::CompletableFuture;
@@ -46,10 +46,10 @@ pub use self::{
     error::{Error, Result},
 };
 
-/// A `Future` that will resolve either immediately, or in the future.
+/// A [`Future`] that will resolve either immediately, or in the future.
 ///
 /// Will not resolve unless it has been explicitly completed, either
-/// by constructing it with `new_completed`, or using `FutureCompleter::complete`.
+/// by constructing it with [`CompletableFuture::new_completed`], or using [`FutureCompleter::complete`].
 #[derive(Debug)]
 pub struct CompletableFuture<T: Unpin> {
     state: Arc<Mutex<State<T>>>,
@@ -64,10 +64,10 @@ impl<T: Unpin + Send + 'static> CompletableFuture<T> {
         (Self { state: s.0 }, FutureCompleter { state: s.1 })
     }
 
-    /// Construct a `CompletableFuture` that will resolve immediately to the
+    /// Construct a [`CompletableFuture`] that will resolve immediately to the
     /// given value.
     ///
-    /// No `FutureCompleter` is returned as the `CompletableFuture` is already complete.
+    /// No [`FutureCompleter`] is returned as the [`CompletableFuture`] is already complete.
     #[must_use]
     pub fn new_completed(value: T) -> Self {
         Self {

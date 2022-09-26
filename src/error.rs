@@ -1,15 +1,15 @@
 use thiserror::Error;
 
-/// Error returned by `Completer::complete` and `Completable` future.
+/// Error returned by [`FutureCompleter::complete`][crate::FutureCompleter::complete] and [`CompletableFuture`][crate::CompletableFuture] future.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Error)]
 pub enum Error {
-    /// The `Completable` future was already resolved to completion.
+    /// The [`CompletableFuture`][crate::CompletableFuture] future was already resolved to completion.
     #[error("future already polled to completion")]
     AlreadyCompleted,
-    /// The `Completer` was dropped before sending completion.
+    /// The [`FutureCompleter`][crate::FutureCompleter] was dropped before sending completion.
     #[error("Completer dropped before sending completion")]
     CompleterDropped,
 }
 
-/// Result of `Completer::complete` and the `Completable` future.
+/// Result of [`FutureCompleter::complete`][crate::FutureCompleter::complete] and the [`CompletableFuture`][crate::CompletableFuture] future.
 pub type Result<T> = std::result::Result<T, Error>;
