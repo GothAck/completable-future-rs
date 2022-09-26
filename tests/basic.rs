@@ -7,12 +7,12 @@ use tokio::runtime::Handle;
 use tracing::{instrument, trace};
 use tracing_test::traced_test;
 
-use completable_future::{CompletableFuture, FutureCompleter};
+use future_clicker::{ControlledFuture, FutureClicker};
 
 #[tokio::test]
 #[traced_test]
 async fn test_completed() {
-    let (future, completer) = CompletableFuture::<usize>::new();
+    let (future, completer) = ControlledFuture::<usize>::new();
 
     assert_eq!(completer.complete(9876), Ok(()));
 
@@ -22,16 +22,16 @@ async fn test_completed() {
 #[tokio::test]
 #[traced_test]
 async fn test_pre_completed() {
-    assert_eq!(CompletableFuture::new_completed(1234usize).await, Ok(1234));
+    assert_eq!(ControlledFuture::new_completed(1234usize).await, Ok(1234));
 }
 
 #[tokio::test(flavor = "multi_thread")]
 #[traced_test]
 async fn test_threaded() {
-    let (future, completer) = CompletableFuture::<usize>::new();
+    let (future, completer) = ControlledFuture::<usize>::new();
 
     #[instrument(skip_all)]
-    fn create_t1(handle: Handle, future: CompletableFuture<usize>) -> impl FnOnce() {
+    fn create_t1(handle: Handle, future: ControlledFuture<usize>) -> impl FnOnce() {
         self::trace!("create t1");
         move || {
             self::trace!("run t1");
@@ -47,7 +47,7 @@ async fn test_threaded() {
     }
 
     #[instrument(skip_all)]
-    fn create_t2(completer: FutureCompleter<usize>) -> impl FnOnce() {
+    fn create_t2(completer: FutureClicker<usize>) -> impl FnOnce() {
         self::trace!("create t2");
         move || {
             self::trace!("run t2");

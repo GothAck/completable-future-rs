@@ -1,26 +1,26 @@
 //! A [`Future`] value that resolves once it's explicitly completed, potentially
-//! from a different thread or task, similar to Java's [`CompletableFuture`].
+//! from a different thread or task, similar to Java's [`ControlledFuture`].
 //!
 //! Currently, this is implemented using [`Mutex`][parking_lot::Mutex] from the [`parking_lot`] crate.
 //!
 //! # Examples
 //!
-//! Create an incomplete [`CompletableFuture`] and explicitly complete it with the
+//! Create an incomplete [`ControlledFuture`] and explicitly complete it with the
 //! completer:
 //! ```
-//! # use completable_future::CompletableFuture;
+//! # use future_clicker::ControlledFuture;
 //! # use futures::executor::block_on;
-//! let (future, completer) = CompletableFuture::<i32>::new();
+//! let (future, completer) = ControlledFuture::<i32>::new();
 //! completer.complete(5).unwrap();
 //! assert_eq!(block_on(future), Ok(5));
 //! ```
 //!
-//! Create an initially complete [`CompletableFuture`] that can be immediately
+//! Create an initially complete [`ControlledFuture`] that can be immediately
 //! resolved:
 //! ```
-//! # use completable_future::CompletableFuture;
+//! # use future_clicker::ControlledFuture;
 //! # use futures::executor::block_on;
-//! assert_eq!(block_on(CompletableFuture::new_completed(10)), Ok(10));
+//! assert_eq!(block_on(ControlledFuture::new_completed(10)), Ok(10));
 //! ```
 
 #![warn(clippy::pedantic, missing_docs)]
@@ -42,32 +42,32 @@ use tracing::{instrument, trace};
 
 use self::state::State;
 pub use self::{
-    completer::FutureCompleter,
+    completer::FutureClicker,
     error::{Error, Result},
 };
 
 /// A [`Future`] that will resolve either immediately, or in the future.
 ///
 /// Will not resolve unless it has been explicitly completed, either
-/// by constructing it with [`CompletableFuture::new_completed`], or using [`FutureCompleter::complete`].
+/// by constructing it with [`ControlledFuture::new_completed`], or using [`FutureClicker::complete`].
 #[derive(Debug)]
-pub struct CompletableFuture<T: Unpin> {
+pub struct ControlledFuture<T: Unpin> {
     state: Arc<Mutex<State<T>>>,
 }
 
-impl<T: Unpin + Send + 'static> CompletableFuture<T> {
-    /// Construct a `CompletableFuture` that will resolve once the returned
-    /// `FutureCompleter` is used to set a value.
+impl<T: Unpin + Send + 'static> ControlledFuture<T> {
+    /// Construct a `ControlledFuture` that will resolve once the returned
+    /// `FutureClicker` is used to set a value.
     #[must_use]
-    pub fn new() -> (Self, FutureCompleter<T>) {
+    pub fn new() -> (Self, FutureClicker<T>) {
         let s = State::new();
-        (Self { state: s.0 }, FutureCompleter { state: s.1 })
+        (Self { state: s.0 }, FutureClicker { state: s.1 })
     }
 
-    /// Construct a [`CompletableFuture`] that will resolve immediately to the
+    /// Construct a [`ControlledFuture`] that will resolve immediately to the
     /// given value.
     ///
-    /// No [`FutureCompleter`] is returned as the [`CompletableFuture`] is already complete.
+    /// No [`FutureClicker`] is returned as the [`ControlledFuture`] is already complete.
     #[must_use]
     pub fn new_completed(value: T) -> Self {
         Self {
@@ -76,7 +76,7 @@ impl<T: Unpin + Send + 'static> CompletableFuture<T> {
     }
 }
 
-impl<T: Unpin + 'static + Send> Future for CompletableFuture<T> {
+impl<T: Unpin + 'static + Send> Future for ControlledFuture<T> {
     type Output = Result<T>;
 
     #[instrument(skip_all)]

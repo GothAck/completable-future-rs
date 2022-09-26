@@ -5,22 +5,22 @@ use tracing::{instrument, trace};
 
 use crate::{state::State, Error, Result};
 
-/// Used to complete a [`CompletableFuture`][crate::CompletableFuture] so it may resolve to the given value.
+/// Used to complete a [`ControlledFuture`][crate::ControlledFuture] so it may resolve to the given value.
 ///
-/// Dropping a [`FutureCompleter`] without calling [`FutureCompleter::complete`] will
-/// cause the [`CompletableFuture`][crate::CompletableFuture] to panic.
+/// Dropping a [`FutureClicker`] without calling [`FutureClicker::complete`] will
+/// cause the [`ControlledFuture`][crate::ControlledFuture] to panic.
 #[derive(Debug)]
 #[allow(clippy::module_name_repetitions)]
-pub struct FutureCompleter<T: Unpin + Send + 'static> {
+pub struct FutureClicker<T: Unpin + Send + 'static> {
     pub(crate) state: Arc<Mutex<State<T>>>,
 }
 
-impl<T: Unpin + Send + 'static> FutureCompleter<T> {
-    /// Complete the associated [`CompletableFuture`][crate::CompletableFuture].
+impl<T: Unpin + Send + 'static> FutureClicker<T> {
+    /// Complete the associated [`ControlledFuture`][crate::ControlledFuture].
     ///
     /// # Errors
-    /// - [`Error::AlreadyCompleted`] - The [`CompletableFuture`][crate::CompletableFuture] future is already resolved.
-    /// - [`Error::CompleterDropped`] - The [`FutureCompleter`] has already been dropped.
+    /// - [`Error::AlreadyCompleted`] - The [`ControlledFuture`][crate::ControlledFuture] future is already resolved.
+    /// - [`Error::CompleterDropped`] - The [`FutureClicker`] has already been dropped.
     #[instrument(skip_all)]
     pub fn complete(self, value: T) -> Result<()> {
         use State::{Complete, Dropped, Incomplete, Waiting};
@@ -49,7 +49,7 @@ impl<T: Unpin + Send + 'static> FutureCompleter<T> {
     }
 }
 
-impl<T: Unpin + Send + 'static> Drop for FutureCompleter<T> {
+impl<T: Unpin + Send + 'static> Drop for FutureClicker<T> {
     #[instrument(skip_all)]
     fn drop(&mut self) {
         use State::{Complete, Dropped, Incomplete, Waiting};

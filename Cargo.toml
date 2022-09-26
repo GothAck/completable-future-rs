@@ -1,9 +1,9 @@
 [package]
-name = "completable-future"
+name = "future-clicker"
 version = "0.1.0"
 authors = ["Greg \"GothAck\" Miell <rust@greg.gothack.ninja>"]
 description = "Reimplementation of manual_future without using `futures` unstable"
-repository = "https://github.com/GothAck/completable-future-rs"
+repository = "https://github.com/GothAck/future-clicker-rs"
 # categories = ["command-line-utilities"]
 license = "MIT"
 edition = "2021"
